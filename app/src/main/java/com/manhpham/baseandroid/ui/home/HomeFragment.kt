@@ -1,7 +1,9 @@
 package com.manhpham.baseandroid.ui.home
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
@@ -12,7 +14,6 @@ import com.manhpham.baseandroid.databinding.FragmentHomeBinding
 import com.manhpham.baseandroid.service.ApiErrorHandler
 import com.manhpham.baseandroid.ui.base.BaseFragment
 import com.manhpham.baseandroid.ui.base.ScreenType
-import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,68 +25,81 @@ interface HomeHandler {
 }
 
 @AndroidEntryPoint
-class HomeFragment : BaseFragment(), HomeHandler {
+class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeHandler {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    @Inject lateinit var errorHandler: ApiErrorHandler
+    @Inject
+    lateinit var errorHandler: ApiErrorHandler
 
     private val adapter = HomeAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        withBinding<FragmentHomeBinding> { binding ->
-            binding.handle = this
-            adapter.listener = { response ->
-                response.type?.let {
-                    when (it) {
-                        "web" -> {
-                            Navigation
-                                .findNavController(requireActivity(), R.id.proxy_fragment_container)
-                                .navigate(HomeFragmentDirections.actionHomeFragmentToDetailWebFragment(response.website!!))
-                        }
-                        "img" -> {
-                            Navigation
-                                .findNavController(requireActivity(), R.id.proxy_fragment_container)
-                                .navigate(HomeFragmentDirections.actionHomeFragmentToDetailImageFragment(response.img!!))
-                        }
+        binding.handle = this
+        adapter.listener = { response ->
+            response.type?.let {
+                when (it) {
+                    "web" -> {
+                        Navigation
+                            .findNavController(requireActivity(), R.id.proxy_fragment_container)
+                            .navigate(
+                                HomeFragmentDirections.actionHomeFragmentToDetailWebFragment(
+                                    response.website!!
+                                )
+                            )
+                    }
+
+                    "img" -> {
+                        Navigation
+                            .findNavController(requireActivity(), R.id.proxy_fragment_container)
+                            .navigate(
+                                HomeFragmentDirections.actionHomeFragmentToDetailImageFragment(
+                                    response.img!!
+                                )
+                            )
                     }
                 }
             }
-            adapter.addLoadStateListener {
-                val isListEmpty = it.refresh is LoadState.NotLoading && adapter.itemCount == 0
-                Timber.d(isListEmpty.toString())
+        }
+        adapter.addLoadStateListener {
+            val isListEmpty = it.refresh is LoadState.NotLoading && adapter.itemCount == 0
+            Timber.d(isListEmpty.toString())
 
-                val isLoading = it.source.refresh is LoadState.Loading ||
+            val isLoading = it.source.refresh is LoadState.Loading ||
                     it.source.append is LoadState.Loading ||
                     it.source.prepend is LoadState.Loading ||
                     it.refresh is LoadState.Loading ||
                     it.append is LoadState.Loading ||
                     it.prepend is LoadState.Loading
 
-                viewModel.isLoadingSingleLive.postValue(isLoading)
+            viewModel.isLoadingSingleLive.postValue(isLoading)
 
-                val errorState = it.source.refresh as? LoadState.Error
-                    ?: it.source.append as? LoadState.Error
-                    ?: it.source.prepend as? LoadState.Error
-                    ?: it.refresh as? LoadState.Error
-                    ?: it.append as? LoadState.Error
-                    ?: it.prepend as? LoadState.Error
+            val errorState = it.source.refresh as? LoadState.Error
+                ?: it.source.append as? LoadState.Error
+                ?: it.source.prepend as? LoadState.Error
+                ?: it.refresh as? LoadState.Error
+                ?: it.append as? LoadState.Error
+                ?: it.prepend as? LoadState.Error
 
-                errorState?.let { error ->
-                    viewModel.singleLiveError.postValue(error.error)
-                }
+            errorState?.let { error ->
+                viewModel.singleLiveError.postValue(error.error)
             }
-            binding.recyclerView.adapter = adapter
-            binding.recyclerView.addItemDecoration(DividerItemDecoration(requireActivity(), DividerItemDecoration.VERTICAL))
-            binding.swipeRefresh.setOnRefreshListener {
-                viewModel.callApi()
-            }
-            viewModel.listItem.observe(viewLifecycleOwner) {
-                binding.swipeRefresh.isRefreshing = false
-                adapter.submitData(lifecycle, it)
-            }
+        }
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                requireActivity(),
+                DividerItemDecoration.VERTICAL
+            )
+        )
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.callApi()
+        }
+        viewModel.listItem.observe(viewLifecycleOwner) {
+            binding.swipeRefresh.isRefreshing = false
+            adapter.submitData(lifecycle, it)
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) {
@@ -126,8 +140,11 @@ class HomeFragment : BaseFragment(), HomeHandler {
         viewModel.sort()
     }
 
-    override fun layoutId(): Int {
-        return R.layout.fragment_home
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentHomeBinding {
+        return FragmentHomeBinding.inflate(inflater, container, false)
     }
 
     override fun screenType(): ScreenType {

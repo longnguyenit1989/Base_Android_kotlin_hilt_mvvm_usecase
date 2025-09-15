@@ -55,7 +55,6 @@ class NetworkModule {
     fun createGson(): Gson {
         return GsonBuilder()
             .setPrettyPrinting()
-            .setLenient()
             .create()
     }
 
