@@ -67,12 +67,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), HomeHandler {
             val isListEmpty = it.refresh is LoadState.NotLoading && adapter.itemCount == 0
             Timber.d(isListEmpty.toString())
 
-            val isLoading = it.source.refresh is LoadState.Loading ||
-                    it.source.append is LoadState.Loading ||
-                    it.source.prepend is LoadState.Loading ||
-                    it.refresh is LoadState.Loading ||
-                    it.append is LoadState.Loading ||
-                    it.prepend is LoadState.Loading
+            val isLoading =
+                it.source.refresh is LoadState.Loading || it.source.append is LoadState.Loading || it.source.prepend is LoadState.Loading || it.refresh is LoadState.Loading || it.append is LoadState.Loading || it.prepend is LoadState.Loading
 
             viewModel.isLoadingSingleLive.postValue(isLoading)
 

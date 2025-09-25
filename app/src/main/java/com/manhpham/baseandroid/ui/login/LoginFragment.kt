@@ -79,7 +79,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(), LoginHandle {
     }
 
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
+        inflater: LayoutInflater,
+        container: ViewGroup?
     ): FragmentLoginBinding {
         return FragmentLoginBinding.inflate(inflater, container, false)
     }

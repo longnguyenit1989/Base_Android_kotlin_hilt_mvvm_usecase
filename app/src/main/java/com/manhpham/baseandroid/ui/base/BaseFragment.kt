@@ -10,7 +10,8 @@ import com.manhpham.baseandroid.ui.dialog.LoadingProgress
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
     private var _binding: T? = null
-    protected val binding: T get() = _binding
+    protected val binding: T
+        get() = _binding
             ?: error("${this::class.simpleName}: binding accessed outside view lifecycle")
 
     val progress: LoadingProgress by lazy { LoadingProgress() }
