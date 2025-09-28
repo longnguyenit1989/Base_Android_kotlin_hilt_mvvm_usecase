@@ -3,18 +3,18 @@ package com.manhpham.baseandroid.ui.detail
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import com.manhpham.baseandroid.R
 import com.manhpham.baseandroid.databinding.FragmentDetailWebBinding
 import com.manhpham.baseandroid.ui.base.BaseFragment
 import com.manhpham.baseandroid.ui.base.ScreenType
-import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 interface DetailHandle {
@@ -22,7 +22,7 @@ interface DetailHandle {
 }
 
 @AndroidEntryPoint
-class DetailWebFragment : BaseFragment(), DetailHandle {
+class DetailWebFragment : BaseFragment<FragmentDetailWebBinding>(), DetailHandle {
 
     private val viewModel: DetailViewModel by viewModels()
 
@@ -30,7 +30,7 @@ class DetailWebFragment : BaseFragment(), DetailHandle {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        withBinding<FragmentDetailWebBinding> {
+        binding.let {
             it.viewModel = viewModel
             it.handle = this
 
@@ -53,8 +53,11 @@ class DetailWebFragment : BaseFragment(), DetailHandle {
         }
     }
 
-    override fun layoutId(): Int {
-        return R.layout.fragment_detail_web
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentDetailWebBinding {
+        return FragmentDetailWebBinding.inflate(inflater, container, false)
     }
 
     override fun screenType(): ScreenType {
@@ -65,7 +68,7 @@ class DetailWebFragment : BaseFragment(), DetailHandle {
         return object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
-                withBinding<FragmentDetailWebBinding> {
+                binding.let {
                     it.buttonClose.text = "Start Loading"
                     it.viewModel?.isLoadingSingleLive?.postValue(true)
                 }
@@ -73,7 +76,7 @@ class DetailWebFragment : BaseFragment(), DetailHandle {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                withBinding<FragmentDetailWebBinding> {
+                binding.let {
                     it.buttonClose.text = "End Loading"
                     it.viewModel?.isLoadingSingleLive?.postValue(false)
                 }

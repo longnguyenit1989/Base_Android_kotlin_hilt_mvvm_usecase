@@ -1,7 +1,9 @@
 package com.manhpham.baseandroid.ui.login
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
@@ -13,7 +15,6 @@ import com.manhpham.baseandroid.ui.base.BaseFragment
 import com.manhpham.baseandroid.ui.base.ScreenType
 import com.manhpham.baseandroid.ui.dialog.DialogManager
 import com.manhpham.baseandroid.ui.dialog.TypeDialog
-import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,21 +23,19 @@ interface LoginHandle {
 }
 
 @AndroidEntryPoint
-class LoginFragment : BaseFragment(), LoginHandle {
+class LoginFragment : BaseFragment<FragmentLoginBinding>(), LoginHandle {
 
     private val viewModel: LoginViewModel by activityViewModels()
 
-    @Inject lateinit var errorHandler: ApiErrorHandler
+    @Inject
+    lateinit var errorHandler: ApiErrorHandler
 
-    @Inject lateinit var dialogManager: DialogManager
-
-    override fun layoutId(): Int {
-        return R.layout.fragment_login
-    }
+    @Inject
+    lateinit var dialogManager: DialogManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        withBinding<FragmentLoginBinding> {
+        binding.let {
             it.viewModel = viewModel
             it.lifecycleOwner = this
             it.handle = this
@@ -53,6 +52,7 @@ class LoginFragment : BaseFragment(), LoginHandle {
                         .findNavController(requireActivity(), R.id.proxy_fragment_container)
                         .navigate(R.id.action_loginFragment_to_loginSuccessFragment)
                 }
+
                 is LoginResult.LoginError -> {
                     dialogManager.showDialog(TypeDialog.RETRY_DIALOG, message = it.message)
                 }
@@ -76,6 +76,13 @@ class LoginFragment : BaseFragment(), LoginHandle {
 
     override fun didTapLogin() {
         viewModel.login()
+    }
+
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentLoginBinding {
+        return FragmentLoginBinding.inflate(inflater, container, false)
     }
 
     override fun screenType(): ScreenType {

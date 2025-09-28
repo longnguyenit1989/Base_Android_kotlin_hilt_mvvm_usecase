@@ -1,24 +1,24 @@
 package com.manhpham.baseandroid.ui.detail
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.manhpham.baseandroid.R
 import com.manhpham.baseandroid.databinding.FragmentDetailImageBinding
 import com.manhpham.baseandroid.ui.base.BaseFragment
 import com.manhpham.baseandroid.ui.base.ScreenType
-import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DetailImageFragment : BaseFragment(), DetailHandle {
+class DetailImageFragment : BaseFragment<FragmentDetailImageBinding>(), DetailHandle {
 
     private val viewModel: DetailViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        withBinding<FragmentDetailImageBinding> { binding ->
+        binding.let { binding ->
             binding.viewModel = viewModel
             binding.handle = this
             arguments?.getString("key")?.let {
@@ -27,8 +27,11 @@ class DetailImageFragment : BaseFragment(), DetailHandle {
         }
     }
 
-    override fun layoutId(): Int {
-        return R.layout.fragment_detail_image
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentDetailImageBinding {
+        return FragmentDetailImageBinding.inflate(inflater, container, false)
     }
 
     override fun screenType(): ScreenType {

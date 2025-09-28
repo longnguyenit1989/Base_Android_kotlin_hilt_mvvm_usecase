@@ -19,11 +19,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
       - name: Unit tests
         run: bash ./gradlew test --stacktrace
       - name: Unit tests results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: unit-tests-results
           path: app/build/reports/tests/testDevDebugUnitTest/index.html
@@ -38,11 +38,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
       - name: Lint debug flavor
         run: bash ./gradlew lintDevDebug --stacktrace
       - name: Lint results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app
           path: app/build/reports/lint-results-devDebug.html
@@ -57,11 +57,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
       - name: Build debug APK
         run: bash ./gradlew assembleDev --stacktrace
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: app
+          name: app-debug
           path: app/build/outputs/apk/dev/debug/app-dev-debug.apk
